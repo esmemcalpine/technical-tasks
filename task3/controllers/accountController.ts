@@ -30,7 +30,8 @@ app.post('/accounts', (req: Request, res: Response) => {
     accounts.push(newAccount);
     return res.status(201).json(newAccount);
   } catch (e) {
-    return res.status(500)
+    console.error('Error creating account: ', e);
+    return res.status(500).json({ error: 'Internal Server Error' });
   }  
 });
 
@@ -53,33 +54,45 @@ app.get('/accounts/:id', (req: Request, res: Response) => {
     return res.status(200).json(account);
     
   } catch (e) {
-    return res.status(500);
+    console.error('Error retrieving account: ', e);
+    return res.status(500).json({ error: 'Internal Server Error' });
   }
   
 });
 
 // Update existing account
 app.put('/accounts/:id', (req: Request, res: Response) => {
-  const accountId: string = req.params.id;
-  const updatedAccount: Account = req.body;
-  const index: number = accounts.findIndex(account => account.id === accountId);
-  if (index === -1) {
-    res.status(404).send('Account not found');
-  } else {
+  try {
+    const accountId: string = req.params.id;
+    const updatedAccount: Account = req.body;
+    const index: number = accounts.findIndex(account => account.id === accountId);
+    if (index === -1) {
+      return res.status(404).send('Account not found');
+    }
     accounts[index] = updatedAccount;
-    res.json(updatedAccount);
+    return res.json(updatedAccount);
+  } catch (e) {
+    console.error('Error updating account: ', e);
+    return res.status(500).json({ error: 'Internal Server Error' });
   }
+  
 });
 
 // Delete account by id
 app.delete('/accounts/:id', (req: Request, res: Response) => {
-  const accountId: string = req.params.id;
-  const account: Account | undefined = accounts.find(account => account.id === accountId);
-  if (!account) {
-    return res.status(404).send('Account not found');
+  try {
+    const accountId: string = req.params.id;
+    const account: Account | undefined = accounts.find(account => account.id === accountId);
+    if (!account) {
+      return res.status(404).send('Account not found');
+    }
+    accounts = accounts.filter(account => account.id !== accountId);
+    return res.sendStatus(204);
+  } catch (e) {
+    console.error('Error deleting account: ', e);
+    return res.status(500).json({ error: 'Internal Server Error' })
   }
-  accounts = accounts.filter(account => account.id !== accountId);
-  return res.sendStatus(204);
+  
 });
 
 // Start server
