@@ -1,21 +1,14 @@
-import express, { Request, Response } from 'express';
-import bodyParser from 'body-parser';
+import { Request, Response } from 'express';
 import { AccountValidationService } from '../services/accountValidationService';
-
-const app = express();
-const PORT = 3000;
 
 
 // In-memory storage
 let accounts: AccountDTO[] = [];
 
-// parses JSON from request body for all requests
-app.use(bodyParser.json());
-
 const accountValidationService = new AccountValidationService();
 
 // Create account
-app.post('/accounts', (req: Request, res: Response) => {
+export const createAccount = async (req: Request, res: Response) => {
   try {
     const newAccount: AccountDTO = req.body;
     accountValidationService.validate(newAccount);
@@ -25,16 +18,15 @@ app.post('/accounts', (req: Request, res: Response) => {
     console.error('Error creating account: ', e);
     return res.status(500).json({ error: 'Internal Server Error' });
   }  
-});
+}
 
 // Get all accounts
-app.get('/accounts', (req: Request, res: Response) => {
+export const getAccounts = async (req: Request, res: Response) => {
   res.json(accounts);
-});
+}
 
 // Get account by id
-app.get('/accounts/:id', (req: Request, res: Response) => {
-
+export const getAccount = async (req: Request, res: Response) => {
   try {
     const accountId: string = req.params.id;
     const account: AccountDTO | undefined = accounts.find(account => account.id === accountId);
@@ -49,11 +41,10 @@ app.get('/accounts/:id', (req: Request, res: Response) => {
     console.error('Error retrieving account: ', e);
     return res.status(500).json({ error: 'Internal Server Error' });
   }
-  
-});
+}
 
 // Update existing account
-app.put('/accounts/:id', (req: Request, res: Response) => {
+export const updateAccount = (req: Request, res: Response) => {
   try {
     const accountId: string = req.params.id;
     const updatedAccount: AccountDTO = req.body;
@@ -67,11 +58,10 @@ app.put('/accounts/:id', (req: Request, res: Response) => {
     console.error('Error updating account: ', e);
     return res.status(500).json({ error: 'Internal Server Error' });
   }
-  
-});
+}
 
 // Delete account by id
-app.delete('/accounts/:id', (req: Request, res: Response) => {
+export const deleteAccount = (req: Request, res: Response) => {
   try {
     const accountId: string = req.params.id;
     const account: AccountDTO | undefined = accounts.find(account => account.id === accountId);
@@ -84,10 +74,4 @@ app.delete('/accounts/:id', (req: Request, res: Response) => {
     console.error('Error deleting account: ', e);
     return res.status(500).json({ error: 'Internal Server Error' })
   }
-  
-});
-
-// Start server
-app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
-});
+}

@@ -9,7 +9,7 @@ export class AccountValidationService {
         // remove id from array, since this will be generated in the back end
         const arr = keys.filter(item => item !== "id");
         arr.forEach(key => {
-            if (!object[key].length) {
+            if (!object[key] || !object[key].length) {
                 this.errors.push(`${key} cannot be empty`)
             }
         });  
