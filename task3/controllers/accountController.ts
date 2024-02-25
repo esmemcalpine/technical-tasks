@@ -5,17 +5,9 @@ import { AccountValidationService } from '../services/accountValidationService';
 const app = express();
 const PORT = 3000;
 
-// do we still need this given there is a model for this now?
-interface Account {
-  id: string;
-  name: string;
-  address: string;
-  phone: string;
-  email: string;
-}
 
 // In-memory storage
-let accounts: Account[] = [];
+let accounts: AccountDTO[] = [];
 
 // parses JSON from request body for all requests
 app.use(bodyParser.json());
@@ -25,7 +17,7 @@ const accountValidationService = new AccountValidationService();
 // Create account
 app.post('/accounts', (req: Request, res: Response) => {
   try {
-    const newAccount: Account = req.body;
+    const newAccount: AccountDTO = req.body;
     accountValidationService.validate(newAccount);
     accounts.push(newAccount);
     return res.status(201).json(newAccount);
@@ -45,7 +37,7 @@ app.get('/accounts/:id', (req: Request, res: Response) => {
 
   try {
     const accountId: string = req.params.id;
-    const account: Account | undefined = accounts.find(account => account.id === accountId);
+    const account: AccountDTO | undefined = accounts.find(account => account.id === accountId);
     if (!account) {
       return res.status(404).send('Account not found');
     }
@@ -64,7 +56,7 @@ app.get('/accounts/:id', (req: Request, res: Response) => {
 app.put('/accounts/:id', (req: Request, res: Response) => {
   try {
     const accountId: string = req.params.id;
-    const updatedAccount: Account = req.body;
+    const updatedAccount: AccountDTO = req.body;
     const index: number = accounts.findIndex(account => account.id === accountId);
     if (index === -1) {
       return res.status(404).send('Account not found');
@@ -82,7 +74,7 @@ app.put('/accounts/:id', (req: Request, res: Response) => {
 app.delete('/accounts/:id', (req: Request, res: Response) => {
   try {
     const accountId: string = req.params.id;
-    const account: Account | undefined = accounts.find(account => account.id === accountId);
+    const account: AccountDTO | undefined = accounts.find(account => account.id === accountId);
     if (!account) {
       return res.status(404).send('Account not found');
     }
